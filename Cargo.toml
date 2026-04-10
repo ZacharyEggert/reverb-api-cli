@@ -1,0 +1,7 @@
+[workspace]
+members = ["crates/reverb-cli", "crates/reverb"]
+resolver = "2"
+
+[profile.dist]
+inherits = "release"
+lto = "thin"

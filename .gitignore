@@ -1,0 +1,11 @@
+/target
+**/*.rs.bk
+Cargo.lock
+.env
+node_modules/
+npm/bin/
+*.tar.gz
+*.zip
+dist/
+coverage/
+lcov.info

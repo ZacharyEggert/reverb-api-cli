@@ -1,0 +1,21 @@
+{
+  "name": "@reverbdotcom/cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reverb CLI — command-line wrapper for the Reverb.com API",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reverbdotcom/cli.git"
+  },
+  "scripts": {
+    "test": "cargo test",
+    "prepare": "lefthook install",
+    "version-sync": "bash scripts/version-sync.sh",
+    "tag-release": "bash scripts/tag-release.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.0.0"
+}
