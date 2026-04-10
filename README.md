@@ -1,6 +1,7 @@
 # Reverb CLI (`revcli`)
 
-A command-line interface for the [Reverb.com](https://reverb.com) API. Manage listings, orders, conversations, and your shop directly from the terminal.
+A command-line interface for the [Reverb.com](https://reverb.com) API. Manage listings, orders, conversations, and your
+shop directly from the terminal.
 
 ## Installation
 
@@ -65,15 +66,15 @@ revcli schema listings.list
 
 ### Key Flags
 
-| Flag | Description |
-|---|---|
-| `--params '<JSON>'` | URL/query parameters |
-| `--json '<JSON>'` | Request body (POST/PUT/PATCH) |
-| `--page-all` | Auto-paginate, output NDJSON |
-| `--page-limit N` | Stop after N pages (default: 10) |
-| `--page-delay MS` | Delay between pages (default: 100ms) |
-| `--format <fmt>` | Output format: `json`, `table`, `yaml`, `csv` |
-| `--dry-run` | Validate without sending request |
+| Flag                | Description                                   |
+|---------------------|-----------------------------------------------|
+| `--params '<JSON>'` | URL/query parameters                          |
+| `--json '<JSON>'`   | Request body (POST/PUT/PATCH)                 |
+| `--page-all`        | Auto-paginate, output NDJSON                  |
+| `--page-limit N`    | Stop after N pages (default: 10)              |
+| `--page-delay MS`   | Delay between pages (default: 100ms)          |
+| `--format <fmt>`    | Output format: `json`, `table`, `yaml`, `csv` |
+| `--dry-run`         | Validate without sending request              |
 
 ## Development
 

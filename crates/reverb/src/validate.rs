@@ -54,9 +54,7 @@ pub fn validate_resource_name(s: &str) -> Result<&str, RevError> {
 pub fn validate_safe_output_path(path: &str) -> Result<(), RevError> {
     check_safe_string(path)?;
     if std::path::Path::new(path).is_absolute() {
-        return Err(RevError::Validation(
-            "output path must be relative".into(),
-        ));
+        return Err(RevError::Validation("output path must be relative".into()));
     }
     if path.contains("..") {
         return Err(RevError::Validation(

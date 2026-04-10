@@ -1,12 +1,16 @@
 # Reverb CLI (`revcli`) Context
 
-The `revcli` CLI provides access to the Reverb.com API (listings, orders, conversations, shop management, etc.) by wrapping REST endpoints with a consistent command interface.
+The `revcli` CLI provides access to the Reverb.com API (listings, orders, conversations, shop management, etc.) by
+wrapping REST endpoints with a consistent command interface.
 
 ## Rules of Engagement for Agents
 
-* **Schema Introspection:** *If you don't know the exact JSON payload structure, run `revcli schema <resource>.<method>` first to inspect the schema before executing.*
-* **Context Window Protection:** *Reverb API responses can be large. ALWAYS use `--params '{"per_page": 5}'` or field filters when listing resources to avoid overwhelming your context window.*
-* **Dry-Run Safety:** *Always use the `--dry-run` flag for mutating operations (create, update, delete) to validate your JSON payload before actual execution.*
+* **Schema Introspection:** *If you don't know the exact JSON payload structure, run `revcli schema <resource>.<method>`
+  first to inspect the schema before executing.*
+* **Context Window Protection:** *Reverb API responses can be large. ALWAYS use `--params '{"per_page": 5}'` or field
+  filters when listing resources to avoid overwhelming your context window.*
+* **Dry-Run Safety:** *Always use the `--dry-run` flag for mutating operations (create, update, delete) to validate your
+  JSON payload before actual execution.*
 
 ## Authentication
 

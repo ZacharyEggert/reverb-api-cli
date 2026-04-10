@@ -36,9 +36,8 @@ pub fn resolve_api_key() -> Result<String, RevError> {
 
 /// Persist the API key to the config file.
 pub fn store_api_key(key: &str) -> Result<(), RevError> {
-    let path = config_key_path().ok_or_else(|| {
-        RevError::Auth("could not determine config directory".into())
-    })?;
+    let path = config_key_path()
+        .ok_or_else(|| RevError::Auth("could not determine config directory".into()))?;
 
     if let Some(dir) = path.parent() {
         fs::create_dir_all(dir)

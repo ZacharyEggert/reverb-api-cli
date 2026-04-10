@@ -12,12 +12,39 @@ impl Helper for ListingsHelper {
         cmd.subcommand(
             Command::new("+draft")
                 .about("Create a listing in draft state with guided prompts")
-                .arg(Arg::new("make").long("make").required(true).help("Instrument make (e.g. Fender)"))
-                .arg(Arg::new("model").long("model").required(true).help("Instrument model (e.g. Stratocaster)"))
-                .arg(Arg::new("price").long("price").required(true).help("Listing price in USD (e.g. 999.00)"))
-                .arg(Arg::new("condition").long("condition").required(true)
-                    .value_parser(["mint", "excellent", "very-good", "good", "fair", "poor", "non-functioning"])
-                    .help("Item condition")),
+                .arg(
+                    Arg::new("make")
+                        .long("make")
+                        .required(true)
+                        .help("Instrument make (e.g. Fender)"),
+                )
+                .arg(
+                    Arg::new("model")
+                        .long("model")
+                        .required(true)
+                        .help("Instrument model (e.g. Stratocaster)"),
+                )
+                .arg(
+                    Arg::new("price")
+                        .long("price")
+                        .required(true)
+                        .help("Listing price in USD (e.g. 999.00)"),
+                )
+                .arg(
+                    Arg::new("condition")
+                        .long("condition")
+                        .required(true)
+                        .value_parser([
+                            "mint",
+                            "excellent",
+                            "very-good",
+                            "good",
+                            "fair",
+                            "poor",
+                            "non-functioning",
+                        ])
+                        .help("Item condition"),
+                ),
         )
     }
 

@@ -1,17 +1,13 @@
 use clap::ArgMatches;
-use reverb::RevError;
 use reverb::client::{execute_with_retry, get_client};
+use reverb::RevError;
 use serde_json::Value;
 use std::time::Duration;
 
 const BASE_URL: &str = "https://api.reverb.com/api";
 
 /// Main entry point: execute the matched resource method.
-pub async fn execute(
-    resource: &str,
-    matches: &ArgMatches,
-    api_key: &str,
-) -> Result<(), RevError> {
+pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Result<(), RevError> {
     // Check if a helper wants to handle this first
     if let Some(helper) = crate::helpers::get_helper(resource) {
         if helper.handle(matches, api_key).await? {
@@ -88,10 +84,7 @@ pub async fn execute(
         .await?;
 
         let status = result.status();
-        let response_body: Value = result
-            .json()
-            .await
-            .map_err(|e| RevError::Other(e.into()))?;
+        let response_body: Value = result.json().await.map_err(|e| RevError::Other(e.into()))?;
 
         if !status.is_success() {
             let message = response_body["message"]
@@ -130,10 +123,7 @@ pub async fn execute(
     Ok(())
 }
 
-fn resolve_method(
-    resource: &str,
-    method: &str,
-) -> Result<(reqwest::Method, String), RevError> {
+fn resolve_method(resource: &str, method: &str) -> Result<(reqwest::Method, String), RevError> {
     // TODO: load from schema registry
     let http_method = match method {
         "list" | "get" | "show" => reqwest::Method::GET,

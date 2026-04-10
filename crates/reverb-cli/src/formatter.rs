@@ -71,9 +71,7 @@ fn print_table(value: &Value, page: usize) -> Result<(), RevError> {
             let line = columns
                 .iter()
                 .enumerate()
-                .map(|(i, col)| {
-                    format!("{:<width$}", cell_str(map.get(col)), width = widths[i])
-                })
+                .map(|(i, col)| format!("{:<width$}", cell_str(map.get(col)), width = widths[i]))
                 .collect::<Vec<_>>()
                 .join("  ");
             println!("{line}");
@@ -135,7 +133,12 @@ fn extract_rows(value: &Value) -> Vec<&Value> {
     }
     if let Value::Object(map) = value {
         for key in &[
-            "listings", "orders", "conversations", "items", "results", "data",
+            "listings",
+            "orders",
+            "conversations",
+            "items",
+            "results",
+            "data",
         ] {
             if let Some(Value::Array(arr)) = map.get(*key) {
                 return arr.iter().collect();

@@ -30,10 +30,7 @@ async fn main() {
         .arg_required_else_help(true)
         .subcommand(auth_commands::command())
         .subcommand(schema_cmd::command())
-        .subcommand(
-            Command::new("--list-resources")
-                .about("List all available API resources"),
-        );
+        .subcommand(Command::new("--list-resources").about("List all available API resources"));
 
     // First-pass: extract subcommand name to determine resource
     let raw_args: Vec<String> = std::env::args().collect();

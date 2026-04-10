@@ -7,18 +7,9 @@ pub fn command() -> Command {
     Command::new("auth")
         .about("Manage Reverb API authentication")
         .arg_required_else_help(true)
-        .subcommand(
-            Command::new("set-key")
-                .about("Save your Reverb API key to the config file"),
-        )
-        .subcommand(
-            Command::new("status")
-                .about("Check whether a valid API key is configured"),
-        )
-        .subcommand(
-            Command::new("remove")
-                .about("Remove the stored API key from the config file"),
-        )
+        .subcommand(Command::new("set-key").about("Save your Reverb API key to the config file"))
+        .subcommand(Command::new("status").about("Check whether a valid API key is configured"))
+        .subcommand(Command::new("remove").about("Remove the stored API key from the config file"))
 }
 
 pub async fn handle(matches: &ArgMatches) -> Result<(), RevError> {

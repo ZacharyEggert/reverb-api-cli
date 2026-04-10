@@ -1,6 +1,7 @@
 # Architecture: API CLI
 
-A generalized architecture guide for building schema-driven, agent-friendly CLI tools that wrap external REST APIs. Based on the patterns found in `gws-cli`.
+A generalized architecture guide for building schema-driven, agent-friendly CLI tools that wrap external REST APIs.
+Based on the patterns found in `gws-cli`.
 
 ---
 
@@ -40,14 +41,15 @@ A generalized architecture guide for building schema-driven, agent-friendly CLI 
 
 ### Why two crates?
 
-| Concern | Library crate | Binary crate |
-|---|---|---|
-| API types, HTTP client | Yes | No |
-| Error types, validation | Yes | No |
-| clap / TUI / formatting | No | Yes |
-| Auth flows, helpers | No | Yes |
+| Concern                 | Library crate | Binary crate |
+|-------------------------|---------------|--------------|
+| API types, HTTP client  | Yes           | No           |
+| Error types, validation | Yes           | No           |
+| clap / TUI / formatting | No            | Yes          |
+| Auth flows, helpers     | No            | Yes          |
 
-The library crate can be published independently (e.g., to crates.io) and reused in other projects (bots, SDKs, test harnesses) without pulling in CLI dependencies.
+The library crate can be published independently (e.g., to crates.io) and reused in other projects (bots, SDKs, test
+harnesses) without pulling in CLI dependencies.
 
 ---
 
@@ -57,7 +59,8 @@ The library crate can be published independently (e.g., to crates.io) and reused
 
 The key technique that enables dynamic command trees.
 
-**Phase 1** — Identify the resource/service from the first positional argument. Fetch its schema (from a remote schema registry, local file, or embedded constant).
+**Phase 1** — Identify the resource/service from the first positional argument. Fetch its schema (from a remote schema
+registry, local file, or embedded constant).
 
 **Phase 2** — Build the full `clap::Command` tree from the schema. Re-parse the original argv against that tree.
 
@@ -72,7 +75,8 @@ argv
               execute matched method
 ```
 
-**Why it works:** `clap` allows constructing the command tree at runtime. The CLI never needs recompilation when the upstream API adds endpoints.
+**Why it works:** `clap` allows constructing the command tree at runtime. The CLI never needs recompilation when the
+upstream API adds endpoints.
 
 **Trade-off:** ~50–200ms startup overhead for schema fetch (mitigated by local caching).
 
@@ -90,17 +94,20 @@ Schema resource: "files"
 ```
 
 Each method's parameters become CLI flags:
+
 - URL path parameters → required `--params` keys
 - Query parameters → `--params` JSON object
 - Request body → `--json` flag (raw JSON or file path)
 - File upload methods → `--upload` flag
 
 Standard flags added to every method:
+
 - `--format` — output format (json | table | yaml | csv)
 - `--page-all` / `--page-limit N` / `--page-delay MS` — pagination
 - `--dry-run` — validate inputs without sending the request
 
 **Schema sources to consider:**
+
 - OpenAPI / Swagger documents
 - GraphQL introspection
 - API Discovery documents (Google style)
@@ -111,7 +118,8 @@ Standard flags added to every method:
 
 ### 3. Trait-Based Service Extensions (`Helper` Pattern)
 
-Most API methods are handled generically by `executor.rs`. For methods that need custom logic (e.g., a "send email" command that constructs MIME internally), use a trait:
+Most API methods are handled generically by `executor.rs`. For methods that need custom logic (e.g., a "send email"
+command that constructs MIME internally), use a trait:
 
 ```rust
 pub trait Helper: Send + Sync {
@@ -123,21 +131,22 @@ pub trait Helper: Send + Sync {
         &'a self,
         schema: &'a ApiSchema,
         matches: &'a ArgMatches,
-    ) -> Pin<Box<dyn Future<Output = Result<bool, CliError>> + Send + 'a>>;
+    ) -> Pin<Box<dyn Future<Output=Result<bool, CliError>> + Send + 'a>>;
 }
 
 pub fn get_helper(service: &str) -> Option<Box<dyn Helper>> {
     match service {
-        "email"   => Some(Box::new(email::EmailHelper)),
+        "email" => Some(Box::new(email::EmailHelper)),
         "storage" => Some(Box::new(storage::StorageHelper)),
-        _         => None,
+        _ => None,
     }
 }
 ```
 
 Each helper lives in its own module under `src/helpers/`. Core code never imports service-specific modules directly.
 
-Custom commands added by helpers can be named with a sigil (e.g., `+send`, `+upload`) to visually distinguish them from schema-generated commands in `--help` output.
+Custom commands added by helpers can be named with a sigil (e.g., `+send`, `+upload`) to visually distinguish them from
+schema-generated commands in `--help` output.
 
 ---
 
@@ -162,16 +171,18 @@ Define a small, stable enum of error categories. Each maps to a distinct exit co
 
 ```rust
 pub enum CliError {
-    Api         { code: u16, message: String },  // exit 1 — upstream API error
-    Auth        (String),                         // exit 2 — authentication failure
-    Validation  (String),                         // exit 3 — bad user input
-    Schema      (String),                         // exit 4 — schema fetch/parse failure
-    Other       (anyhow::Error),                  // exit 5 — unexpected error
+    Api { code: u16, message: String },  // exit 1 — upstream API error
+    Auth(String),                         // exit 2 — authentication failure
+    Validation(String),                         // exit 3 — bad user input
+    Schema(String),                         // exit 4 — schema fetch/parse failure
+    Other(anyhow::Error),                  // exit 5 — unexpected error
 }
 ```
 
 Rules:
-- Always serialize errors as JSON to stdout (not just human-readable stderr messages) so agents and scripts can parse them.
+
+- Always serialize errors as JSON to stdout (not just human-readable stderr messages) so agents and scripts can parse
+  them.
 - Print human-readable colored output to stderr separately.
 - Exit codes must be stable across versions — treat them as a public API.
 
@@ -187,13 +198,16 @@ Support multiple credential sources resolved in priority order:
 4. Application/platform default credentials fallback — for cloud VMs
 
 **Token storage:**
+
 - Encrypt at rest with AES-256-GCM
 - Store the encryption key in the OS keyring (Keychain on macOS, libsecret on Linux, Credential Manager on Windows)
 - Fallback: store key in a separate file if no keyring available
 
 **Token refresh:**
+
 - Access tokens expire. Store refresh tokens and exchange them transparently.
-- Use an `AccessTokenProvider` trait so long-running helpers can request fresh tokens without knowing credential internals.
+- Use an `AccessTokenProvider` trait so long-running helpers can request fresh tokens without knowing credential
+  internals.
 
 ---
 
@@ -202,15 +216,18 @@ Support multiple credential sources resolved in priority order:
 Support at minimum: JSON (default), Table, YAML, CSV.
 
 **Pagination-aware formatting:**
+
 - JSON: first page → pretty-printed object; subsequent pages → NDJSON (one compact object per line)
 - Table/CSV: emit headers only on first page; data-only rows on continuation
 - YAML: emit `---` document separator between pages
 
 **Smart extraction:**
+
 - API responses often nest the data array: `{ "files": [...], "nextPageToken": "..." }`
 - Detect and unwrap the data array automatically so `--format table` shows rows, not a single-column response wrapper.
 
 **Nested field flattening for tables:**
+
 - `{ "owner": { "name": "Alice" } }` → column `owner.name`
 - Truncate deeply nested objects to keep tables readable.
 
@@ -219,13 +236,16 @@ Support at minimum: JSON (default), Table, YAML, CSV.
 ### 8. Input Validation
 
 **At parse boundaries (before any untrusted input is processed):**
+
 - Strip or reject Unicode control characters (U+0000–U+001F, U+007F–U+009F)
 - Reject bidirectional override characters (U+202A–U+202E, U+2066–U+2069, U+200F, U+200E)
 - Reject zero-width characters (U+200B, U+FEFF, etc.)
 
-This is especially important when the CLI is invoked by an LLM agent, since prompts embedded in API responses could otherwise inject instructions into subsequent processing.
+This is especially important when the CLI is invoked by an LLM agent, since prompts embedded in API responses could
+otherwise inject instructions into subsequent processing.
 
 **Path validation (for `--upload`, `--output` flags):**
+
 - Reject paths containing `..` components
 - Canonicalize and verify the path stays within the allowed directory
 - Resolve symlinks before checking containment
@@ -246,6 +266,7 @@ pub struct ServiceEntry {
 ```
 
 Enables:
+
 - Tab completion for service names
 - `<cli> --list-services` introspection command
 - Aliasing: `<cli> storage` → `<cli> storage_v2`
@@ -270,9 +291,9 @@ This makes the CLI self-documenting and removes the need for users to read API r
 
 - Use a single shared client instance (via `OnceLock` or `LazyLock`) for connection pooling.
 - Implement retry with exponential backoff for:
-  - 429 Too Many Requests (respect `Retry-After` header)
-  - 503 Service Unavailable
-  - Transient network errors (connection reset, timeout)
+    - 429 Too Many Requests (respect `Retry-After` header)
+    - 503 Service Unavailable
+    - Transient network errors (connection reset, timeout)
 - Cap total retry time (e.g., 60 seconds).
 - Set a meaningful `User-Agent` header identifying the CLI and its version.
 
@@ -288,7 +309,8 @@ Auto-pagination driven by cursor/token fields in the response.
 --page-delay MS         wait between requests (default: 100ms — be polite)
 ```
 
-The cursor field name varies by API (`nextPageToken`, `next_cursor`, `Link` header). Detect the active pagination mechanism from the schema or by inspecting the first response.
+The cursor field name varies by API (`nextPageToken`, `next_cursor`, `Link` header). Detect the active pagination
+mechanism from the schema or by inspecting the first response.
 
 ---
 
@@ -299,8 +321,8 @@ For APIs that accept file uploads:
 1. Detect MIME type from file extension (via `mime_guess` or equivalent).
 2. Allow override with `--upload-content-type`.
 3. Construct a multipart/related body:
-   - Part 1: `application/json` (resource metadata from `--json`)
-   - Part 2: `<mime-type>` (file content)
+    - Part 1: `application/json` (resource metadata from `--json`)
+    - Part 2: `<mime-type>` (file content)
 4. Set `uploadType=multipart` or equivalent query parameter.
 
 ---
@@ -310,12 +332,12 @@ For APIs that accept file uploads:
 Two output channels:
 
 1. **Structured stderr logging** (enabled via env var, e.g., `<CLI>_LOG=debug`):
-   - Use `tracing` + `tracing-subscriber`
-   - Format: human-readable text in development, JSON in production/CI
+    - Use `tracing` + `tracing-subscriber`
+    - Format: human-readable text in development, JSON in production/CI
 
 2. **File logging** (enabled via `<CLI>_LOG_FILE=/path/to/dir`):
-   - Daily-rotated JSON files
-   - Useful for audit trails and debugging in CI
+    - Daily-rotated JSON files
+    - Useful for audit trails and debugging in CI
 
 Never mix log output with stdout. stdout is reserved for structured data output that scripts and agents consume.
 
@@ -323,19 +345,19 @@ Never mix log output with stdout. stdout is reserved for structured data output 
 
 ## Key Dependencies (Rust)
 
-| Purpose | Crate |
-|---|---|
-| CLI parsing | `clap 4` |
-| Async runtime | `tokio 1` |
-| HTTP client | `reqwest 0.12` |
-| Serialization | `serde`, `serde_json` |
-| Error handling | `thiserror`, `anyhow` |
-| Encryption | `aes-gcm` |
-| OS keyring | `keyring` |
-| MIME detection | `mime_guess` |
-| Logging | `tracing`, `tracing-subscriber` |
-| TUI (optional) | `ratatui`, `crossterm` |
-| Memory safety | `zeroize` (for secrets) |
+| Purpose        | Crate                           |
+|----------------|---------------------------------|
+| CLI parsing    | `clap 4`                        |
+| Async runtime  | `tokio 1`                       |
+| HTTP client    | `reqwest 0.12`                  |
+| Serialization  | `serde`, `serde_json`           |
+| Error handling | `thiserror`, `anyhow`           |
+| Encryption     | `aes-gcm`                       |
+| OS keyring     | `keyring`                       |
+| MIME detection | `mime_guess`                    |
+| Logging        | `tracing`, `tracing-subscriber` |
+| TUI (optional) | `ratatui`, `crossterm`          |
+| Memory safety  | `zeroize` (for secrets)         |
 
 ---
 
@@ -343,19 +365,20 @@ Never mix log output with stdout. stdout is reserved for structured data output 
 
 To apply this to a different API:
 
-| Step | What to change |
-|---|---|
-| Schema source | Replace Discovery/OpenAPI parsing in `schema.rs` with your format |
-| Service registry | Populate `services.rs` with your API's resources |
-| Auth layer | Swap OAuth for API key, JWT, HMAC, etc. — keep the `AccessTokenProvider` trait |
-| URL building | Adapt `executor.rs` URL construction to your API's conventions |
-| Pagination | Detect your API's cursor mechanism; plug into the existing pagination loop |
-| Helpers | Add service-specific helpers for anything the schema can't express |
-| Validators | Keep character/path validation as-is; add domain-specific rules |
-| Formatter | Keep as-is — it's generic JSON/table/YAML/CSV |
-| Error codes | Keep the exit code contract; adjust error variant names |
+| Step             | What to change                                                                 |
+|------------------|--------------------------------------------------------------------------------|
+| Schema source    | Replace Discovery/OpenAPI parsing in `schema.rs` with your format              |
+| Service registry | Populate `services.rs` with your API's resources                               |
+| Auth layer       | Swap OAuth for API key, JWT, HMAC, etc. — keep the `AccessTokenProvider` trait |
+| URL building     | Adapt `executor.rs` URL construction to your API's conventions                 |
+| Pagination       | Detect your API's cursor mechanism; plug into the existing pagination loop     |
+| Helpers          | Add service-specific helpers for anything the schema can't express             |
+| Validators       | Keep character/path validation as-is; add domain-specific rules                |
+| Formatter        | Keep as-is — it's generic JSON/table/YAML/CSV                                  |
+| Error codes      | Keep the exit code contract; adjust error variant names                        |
 
-What you do **not** need to change: the two-phase parsing pattern, the `Helper` trait pattern, the error enum structure, the output formatter, the pagination loop design, or the logging setup. These are API-agnostic.
+What you do **not** need to change: the two-phase parsing pattern, the `Helper` trait pattern, the error enum structure,
+the output formatter, the pagination loop design, or the logging setup. These are API-agnostic.
 
 ---
 

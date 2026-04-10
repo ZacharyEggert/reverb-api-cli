@@ -14,12 +14,33 @@
   },
   "preferUnplugged": true,
   "supportedPlatforms": {
-    "aarch64-apple-darwin":      { "artifact": "revcli-{version}-aarch64-apple-darwin.tar.gz",      "binary": "revcli" },
-    "x86_64-apple-darwin":       { "artifact": "revcli-{version}-x86_64-apple-darwin.tar.gz",       "binary": "revcli" },
-    "aarch64-unknown-linux-gnu": { "artifact": "revcli-{version}-aarch64-unknown-linux-gnu.tar.gz", "binary": "revcli" },
-    "aarch64-unknown-linux-musl":{ "artifact": "revcli-{version}-aarch64-unknown-linux-musl.tar.gz","binary": "revcli" },
-    "x86_64-unknown-linux-gnu":  { "artifact": "revcli-{version}-x86_64-unknown-linux-gnu.tar.gz",  "binary": "revcli" },
-    "x86_64-unknown-linux-musl": { "artifact": "revcli-{version}-x86_64-unknown-linux-musl.tar.gz", "binary": "revcli" },
-    "x86_64-pc-windows-msvc":    { "artifact": "revcli-{version}-x86_64-pc-windows-msvc.zip",       "binary": "revcli.exe" }
+    "aarch64-apple-darwin": {
+      "artifact": "revcli-{version}-aarch64-apple-darwin.tar.gz",
+      "binary": "revcli"
+    },
+    "x86_64-apple-darwin": {
+      "artifact": "revcli-{version}-x86_64-apple-darwin.tar.gz",
+      "binary": "revcli"
+    },
+    "aarch64-unknown-linux-gnu": {
+      "artifact": "revcli-{version}-aarch64-unknown-linux-gnu.tar.gz",
+      "binary": "revcli"
+    },
+    "aarch64-unknown-linux-musl": {
+      "artifact": "revcli-{version}-aarch64-unknown-linux-musl.tar.gz",
+      "binary": "revcli"
+    },
+    "x86_64-unknown-linux-gnu": {
+      "artifact": "revcli-{version}-x86_64-unknown-linux-gnu.tar.gz",
+      "binary": "revcli"
+    },
+    "x86_64-unknown-linux-musl": {
+      "artifact": "revcli-{version}-x86_64-unknown-linux-musl.tar.gz",
+      "binary": "revcli"
+    },
+    "x86_64-pc-windows-msvc": {
+      "artifact": "revcli-{version}-x86_64-pc-windows-msvc.zip",
+      "binary": "revcli.exe"
+    }
   }
 }
