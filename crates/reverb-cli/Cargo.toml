@@ -11,19 +11,20 @@ path = "src/main.rs"
 
 [dependencies]
 reverb = { version = "0.1.0", path = "../reverb" }
-anyhow = "1"
+#anyhow = "1"
 clap = { version = "4", features = ["derive", "string"] }
 dirs = "5"
 dotenvy = "0.15"
 reqwest = { version = "0.12", features = ["json", "rustls-tls-native-roots"], default-features = false }
-serde = { version = "1", features = ["derive"] }
+#serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-thiserror = "2"
+#thiserror = "2"
 tokio = { version = "1", features = ["full"] }
-futures-util = "0.3"
-tracing = "0.1"
+#futures-util = "0.3"
+#tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
-chrono = "0.4"
+#chrono = "0.4"
+percent-encoding = "2.3.2"
 
 [dev-dependencies]
-tempfile = "3"
+#tempfile = "3"
