@@ -2,6 +2,7 @@ use clap::ArgMatches;
 use reverb::client::{execute_with_retry, get_client};
 use reverb::RevError;
 use serde_json::Value;
+use std::io::Write;
 use std::time::Duration;
 
 const BASE_URL: &str = "https://api.reverb.com/api";
@@ -52,6 +53,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         .get_one::<String>("format")
         .map(|s| s.as_str())
         .unwrap_or("json");
+    let output_path = method_matches.get_one::<String>("output");
 
     if dry_run {
         eprintln!("dry-run: would call {resource}.{method_name}");
@@ -67,6 +69,14 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
     // Resolve HTTP method and path from schema
     let (http_method, path) = resolve_method(resource, method_name)?;
     let url = build_url(&path, &params)?;
+
+    let mut writer: Box<dyn Write> = match output_path {
+        Some(path) => Box::new(
+            std::fs::File::create(path)
+                .map_err(|e| RevError::Other(anyhow::anyhow!("cannot open output file: {e}")))?,
+        ),
+        None => Box::new(std::io::stdout()),
+    };
 
     let mut page = 0usize;
     let mut cursor: Option<String> = None;
@@ -121,7 +131,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
             });
         }
 
-        crate::formatter::print(&response_body, format, page)?;
+        crate::formatter::print(&response_body, format, page, &mut *writer)?;
         page += 1;
 
         // Pagination

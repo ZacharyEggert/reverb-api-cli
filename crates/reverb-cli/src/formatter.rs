@@ -1,33 +1,40 @@
 use reverb::RevError;
 use serde_json::Value;
+use std::io::Write;
 
 /// Print a JSON value in the requested format.
 /// `page` is 0-indexed; headers/separators are only emitted on page 0.
-pub fn print(value: &Value, format: &str, page: usize) -> Result<(), RevError> {
+pub fn print(
+    value: &Value,
+    format: &str,
+    page: usize,
+    writer: &mut dyn Write,
+) -> Result<(), RevError> {
     match format {
-        "json" | "" => print_json(value, page),
-        "table" => print_table(value, page),
-        "yaml" => print_yaml(value, page),
-        "csv" => print_csv(value, page),
+        "json" | "" => print_json(value, page, writer),
+        "table" => print_table(value, page, writer),
+        "yaml" => print_yaml(value, page, writer),
+        "csv" => print_csv(value, page, writer),
         other => Err(RevError::Validation(format!("unknown format '{other}'"))),
     }
 }
 
-fn print_json(value: &Value, page: usize) -> Result<(), RevError> {
+fn print_json(value: &Value, page: usize, writer: &mut dyn Write) -> Result<(), RevError> {
     if page == 0 {
-        println!("{}", serde_json::to_string_pretty(value).unwrap());
+        writeln!(writer, "{}", serde_json::to_string_pretty(value).unwrap())
+            .map_err(|e| RevError::Other(e.into()))
     } else {
         // NDJSON for subsequent pages
-        println!("{}", serde_json::to_string(value).unwrap());
+        writeln!(writer, "{}", serde_json::to_string(value).unwrap())
+            .map_err(|e| RevError::Other(e.into()))
     }
-    Ok(())
 }
 
-fn print_table(value: &Value, page: usize) -> Result<(), RevError> {
+fn print_table(value: &Value, page: usize, writer: &mut dyn Write) -> Result<(), RevError> {
     let rows = extract_rows(value);
     if rows.is_empty() {
         if page == 0 {
-            println!("(no results)");
+            writeln!(writer, "(no results)").map_err(|e| RevError::Other(e.into()))?;
         }
         return Ok(());
     }
@@ -62,8 +69,9 @@ fn print_table(value: &Value, page: usize) -> Result<(), RevError> {
             .map(|(i, c)| format!("{:<width$}", c, width = widths[i]))
             .collect::<Vec<_>>()
             .join("  ");
-        println!("{header}");
-        println!("{}", "-".repeat(header.len()));
+        writeln!(writer, "{header}").map_err(|e| RevError::Other(e.into()))?;
+        writeln!(writer, "{}", "-".repeat(header.len()))
+            .map_err(|e| RevError::Other(e.into()))?;
     }
 
     for row in &rows {
@@ -74,23 +82,23 @@ fn print_table(value: &Value, page: usize) -> Result<(), RevError> {
                 .map(|(i, col)| format!("{:<width$}", cell_str(map.get(col)), width = widths[i]))
                 .collect::<Vec<_>>()
                 .join("  ");
-            println!("{line}");
+            writeln!(writer, "{line}").map_err(|e| RevError::Other(e.into()))?;
         }
     }
 
     Ok(())
 }
 
-fn print_yaml(value: &Value, page: usize) -> Result<(), RevError> {
+fn print_yaml(value: &Value, page: usize, writer: &mut dyn Write) -> Result<(), RevError> {
     if page > 0 {
-        println!("---");
+        writeln!(writer, "---").map_err(|e| RevError::Other(e.into()))?;
     }
     // Simple YAML-like output; replace with serde_yaml if added as a dep
-    println!("{}", serde_json::to_string_pretty(value).unwrap());
-    Ok(())
+    writeln!(writer, "{}", serde_json::to_string_pretty(value).unwrap())
+        .map_err(|e| RevError::Other(e.into()))
 }
 
-fn print_csv(value: &Value, page: usize) -> Result<(), RevError> {
+fn print_csv(value: &Value, page: usize, writer: &mut dyn Write) -> Result<(), RevError> {
     let rows = extract_rows(value);
     if rows.is_empty() {
         return Ok(());
@@ -108,7 +116,7 @@ fn print_csv(value: &Value, page: usize) -> Result<(), RevError> {
     }
 
     if page == 0 {
-        println!("{}", columns.join(","));
+        writeln!(writer, "{}", columns.join(",")).map_err(|e| RevError::Other(e.into()))?;
     }
 
     for row in &rows {
@@ -118,7 +126,7 @@ fn print_csv(value: &Value, page: usize) -> Result<(), RevError> {
                 .map(|col| csv_escape(&cell_str(map.get(col))))
                 .collect::<Vec<_>>()
                 .join(",");
-            println!("{line}");
+            writeln!(writer, "{line}").map_err(|e| RevError::Other(e.into()))?;
         }
     }
 
