@@ -68,7 +68,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
 
     // Resolve HTTP method and path from schema
     let (http_method, path) = resolve_method(resource, method_name)?;
-    let url = build_url(&path, &params)?;
+    let (url, extra_query) = build_url(&path, &params)?;
 
     let mut writer: Box<dyn Write> = match output_path {
         Some(path) => Box::new(
@@ -95,6 +95,10 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
 
             if let Some(ref pp) = per_page {
                 req = req.query(&[("per_page", pp.as_str())]);
+            }
+
+            if !extra_query.is_empty() {
+                req = req.query(&extra_query);
             }
 
             if let Some(ref q) = query {
@@ -180,15 +184,21 @@ fn resolve_method(resource: &str, method: &str) -> Result<(reqwest::Method, Stri
     Ok((http_method, path))
 }
 
-fn build_url(path: &str, params: &Option<serde_json::Value>) -> Result<String, RevError> {
-    // Substitute simple {placeholder} values from params
+/// Returns `(url, extra_query_params)`.
+/// Params matching `{key}` placeholders are substituted into the path;
+/// all others are returned as query params.
+fn build_url(
+    path: &str,
+    params: &Option<serde_json::Value>,
+) -> Result<(String, Vec<(String, String)>), RevError> {
     let mut url = path.to_string();
+    let mut extra_query: Vec<(String, String)> = Vec::new();
 
     if let Some(Value::Object(map)) = params {
         for (k, v) in map {
             let placeholder = format!("{{{k}}}");
+            let val = v.as_str().unwrap_or(&v.to_string()).to_string();
             if url.contains(&placeholder) {
-                let val = v.as_str().unwrap_or(&v.to_string()).to_string();
                 reverb::validate::validate_resource_name(&val)?;
                 url = url.replace(
                     &placeholder,
@@ -198,9 +208,11 @@ fn build_url(path: &str, params: &Option<serde_json::Value>) -> Result<String, R
                     )
                     .to_string(),
                 );
+            } else {
+                extra_query.push((k.clone(), val));
             }
         }
     }
 
-    Ok(url)
+    Ok((url, extra_query))
 }
