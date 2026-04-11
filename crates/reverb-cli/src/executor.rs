@@ -22,7 +22,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
 
     let query: Option<Value> = method_matches
         .get_one::<String>("query")
-        .map(|s| s.clone())
+        .cloned()
         .map(Value::String);
     let params: Option<Value> = method_matches
         .get_one::<String>("params")
@@ -37,9 +37,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         .map_err(|e| RevError::Validation(format!("invalid --json: {e}")))?;
 
     let dry_run = method_matches.get_flag("dry-run");
-    let per_page: Option<String> = method_matches
-        .get_one::<String>("per-page")
-        .map(|s| s.clone());
+    let per_page: Option<String> = method_matches.get_one::<String>("per-page").cloned();
     let page_all = method_matches.get_flag("page-all");
     let page_limit: usize = method_matches
         .get_one::<String>("page-limit")
