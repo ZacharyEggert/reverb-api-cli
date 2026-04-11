@@ -22,7 +22,7 @@ npx @reverbdotcom/cli listings list
 ### Cargo
 
 ```bash
-cargo install reverb-cli
+cargo install reverb-api-cli
 ```
 
 ### GitHub Releases

@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/reverb-cli", "crates/reverb"]
+members = ["crates/reverb-api-cli", "crates/reverb-api"]
 resolver = "2"
 
 [profile.dist]

@@ -1,6 +1,6 @@
 use clap::ArgMatches;
-use reverb::client::{execute_with_retry, get_client};
-use reverb::RevError;
+use reverb_api::client::{execute_with_retry, get_client};
+use reverb_api::RevError;
 use serde_json::Value;
 use std::io::Write;
 use std::time::Duration;
@@ -197,7 +197,7 @@ fn build_url(
             let placeholder = format!("{{{k}}}");
             let val = v.as_str().unwrap_or(&v.to_string()).to_string();
             if url.contains(&placeholder) {
-                reverb::validate::validate_resource_name(&val)?;
+                reverb_api::validate::validate_resource_name(&val)?;
                 url = url.replace(
                     &placeholder,
                     &percent_encoding::utf8_percent_encode(

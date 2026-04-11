@@ -16,7 +16,7 @@ use clap::Command;
 // use clap::{Arg, Command};
 use dotenvy::dotenv;
 use error::print_error;
-use reverb::services;
+use reverb_api::services;
 
 #[tokio::main]
 async fn main() {

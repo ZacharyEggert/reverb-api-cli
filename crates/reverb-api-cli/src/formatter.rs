@@ -1,4 +1,4 @@
-use reverb::RevError;
+use reverb_api::RevError;
 use serde_json::Value;
 use std::io::Write;
 

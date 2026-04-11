@@ -1,5 +1,5 @@
 use clap::{Arg, ArgMatches, Command};
-use reverb::services;
+use reverb_api::services;
 
 pub fn command() -> Command {
     Command::new("schema")

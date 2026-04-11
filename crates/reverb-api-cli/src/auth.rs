@@ -1,4 +1,4 @@
-use reverb::RevError;
+use reverb_api::RevError;
 use std::fs;
 use std::path::PathBuf;
 

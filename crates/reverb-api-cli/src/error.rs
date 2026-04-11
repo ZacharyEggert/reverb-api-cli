@@ -1,4 +1,4 @@
-use reverb::RevError;
+use reverb_api::RevError;
 
 /// Print a structured error to stdout (JSON) and a human-readable message to stderr.
 pub fn print_error(e: &RevError) {

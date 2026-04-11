@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sync the version from crates/reverb-cli/Cargo.toml → npm/package.json and package.json
+# Sync the version from crates/reverb-api-cli/Cargo.toml → npm/package.json and package.json
 set -euo pipefail
 
 VERSION=$(grep '^version' crates/reverb-cli/Cargo.toml | head -1 | sed 's/version = "//;s/"//')

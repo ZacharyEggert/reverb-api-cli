@@ -1,5 +1,5 @@
 [package]
-name = "reverb"
+name = "reverb-api"
 version = "0.1.0-alpha.1"
 edition = "2021"
 description = "Reverb.com API client — endpoint schema types, service registry, and HTTP utilities"
@@ -8,7 +8,7 @@ repository = "https://github.com/reverbdotcom/cli"
 
 [dependencies]
 anyhow = "1"
-percent-encoding = "2.3"
+#percent-encoding = "2.3"
 reqwest = { version = "0.12", features = ["json", "rustls-tls-native-roots"], default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -17,5 +17,5 @@ tokio = { version = "1", features = ["time", "fs"] }
 tracing = "0.1"
 
 [dev-dependencies]
-tempfile = "3"
+#tempfile = "3"
 tokio = { version = "1", features = ["full", "test-util"] }

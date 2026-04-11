@@ -1,5 +1,5 @@
 use clap::{ArgMatches, Command};
-use reverb::RevError;
+use reverb_api::RevError;
 
 use crate::auth;
 
