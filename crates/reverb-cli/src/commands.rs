@@ -26,6 +26,12 @@ fn build_method_command(method: &str) -> Command {
     Command::new(method.to_string())
         .about(format!("{method} operation"))
         .arg(
+            Arg::new("query")
+                .long("query")
+                .value_name("STRING")
+                .help("Search/filter query string (e.g. 'Gibson Les Paul'))"),
+        )
+        .arg(
             Arg::new("params")
                 .long("params")
                 .value_name("JSON")
@@ -56,6 +62,12 @@ fn build_method_command(method: &str) -> Command {
                 .value_name("MS")
                 .default_value("100")
                 .help("Milliseconds to wait between page requests"),
+        )
+        .arg(
+            Arg::new("per-page")
+                .long("per-page")
+                .value_name("N")
+                .help("Number of results per page (sent as per_page query param)"),
         )
         .arg(
             Arg::new("format")

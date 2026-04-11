@@ -19,6 +19,10 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         return Err(RevError::Validation("no method specified".into()));
     };
 
+    let query: Option<Value> = method_matches
+        .get_one::<String>("query")
+        .map(|s| s.clone())
+        .map(Value::String);
     let params: Option<Value> = method_matches
         .get_one::<String>("params")
         .map(|s| serde_json::from_str(s))
@@ -32,6 +36,9 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         .map_err(|e| RevError::Validation(format!("invalid --json: {e}")))?;
 
     let dry_run = method_matches.get_flag("dry-run");
+    let per_page: Option<String> = method_matches
+        .get_one::<String>("per-page")
+        .map(|s| s.clone());
     let page_all = method_matches.get_flag("page-all");
     let page_limit: usize = method_matches
         .get_one::<String>("page-limit")
@@ -69,12 +76,20 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
             let mut req = get_client()
                 .request(http_method.clone(), &url)
                 .header("Authorization", format!("Bearer {api_key}"))
-                .header("Accept", "application/hal+json");
+                .header("Accept", "application/hal+json")
+                .header("Accept-Version", "3.0");
 
             if let Some(ref c) = cursor {
                 req = req.query(&[("page", c.as_str())]);
             }
 
+            if let Some(ref pp) = per_page {
+                req = req.query(&[("per_page", pp.as_str())]);
+            }
+
+            if let Some(ref q) = query {
+                req = req.query(&[("query", q.as_str())]);
+            }
             if let Some(ref b) = body {
                 req = req.json(b);
             }
@@ -84,7 +99,16 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         .await?;
 
         let status = result.status();
-        let response_body: Value = result.json().await.map_err(|e| RevError::Other(e.into()))?;
+        let body_text = result
+            .text()
+            .await
+            .map_err(|e| RevError::Other(e.into()))?;
+        tracing::trace!(%status, body = %body_text, "raw API response");
+        let response_body: Value = serde_json::from_str(&body_text).map_err(|e| {
+            RevError::Other(anyhow::anyhow!(
+                "failed to parse response as JSON: {e} \n raw body: {body_text}"
+            ))
+        })?;
 
         if !status.is_success() {
             let message = response_body["message"]

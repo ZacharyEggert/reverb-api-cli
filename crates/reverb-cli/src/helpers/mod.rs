@@ -30,7 +30,7 @@ pub fn get_helper(resource: &str) -> Option<Box<dyn Helper>> {
     }
 }
 
-/// Percent-encode a string for safe embedding in a URL path segment.
-pub fn encode_path_segment(s: &str) -> String {
-    percent_encoding::utf8_percent_encode(s, percent_encoding::NON_ALPHANUMERIC).to_string()
-}
+// /// Percent-encode a string for safe embedding in a URL path segment.
+// pub fn encode_path_segment(s: &str) -> String {
+//     percent_encoding::utf8_percent_encode(s, percent_encoding::NON_ALPHANUMERIC).to_string()
+// }

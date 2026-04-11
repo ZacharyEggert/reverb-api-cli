@@ -12,7 +12,8 @@ mod helpers;
 mod logging;
 mod schema_cmd;
 
-use clap::{Arg, Command};
+use clap::{Command};
+// use clap::{Arg, Command};
 use dotenvy::dotenv;
 use error::print_error;
 use reverb::services;
