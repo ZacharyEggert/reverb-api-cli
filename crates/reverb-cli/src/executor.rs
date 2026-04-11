@@ -109,10 +109,7 @@ pub async fn execute(resource: &str, matches: &ArgMatches, api_key: &str) -> Res
         .await?;
 
         let status = result.status();
-        let body_text = result
-            .text()
-            .await
-            .map_err(|e| RevError::Other(e.into()))?;
+        let body_text = result.text().await.map_err(|e| RevError::Other(e.into()))?;
         tracing::trace!(%status, body = %body_text, "raw API response");
         let response_body: Value = serde_json::from_str(&body_text).map_err(|e| {
             RevError::Other(anyhow::anyhow!(

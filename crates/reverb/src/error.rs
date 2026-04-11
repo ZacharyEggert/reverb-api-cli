@@ -26,7 +26,11 @@ pub enum RevError {
     Schema(String),
 
     #[error("{0}")]
-    Other(#[from] #[serde(serialize_with = "serialize_anyhow")] anyhow::Error),
+    Other(
+        #[from]
+        #[serde(serialize_with = "serialize_anyhow")]
+        anyhow::Error,
+    ),
 }
 
 fn serialize_anyhow<S: serde::Serializer>(e: &anyhow::Error, s: S) -> Result<S::Ok, S::Error> {

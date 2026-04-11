@@ -70,8 +70,7 @@ fn print_table(value: &Value, page: usize, writer: &mut dyn Write) -> Result<(),
             .collect::<Vec<_>>()
             .join("  ");
         writeln!(writer, "{header}").map_err(|e| RevError::Other(e.into()))?;
-        writeln!(writer, "{}", "-".repeat(header.len()))
-            .map_err(|e| RevError::Other(e.into()))?;
+        writeln!(writer, "{}", "-".repeat(header.len())).map_err(|e| RevError::Other(e.into()))?;
     }
 
     for row in &rows {
