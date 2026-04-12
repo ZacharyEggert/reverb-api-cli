@@ -56,7 +56,13 @@ async fn main() {
             }
             return;
         }
-        "--list-resources" | "help" | "--help" | "-h" | "--version" | "-V" => {
+        "--list-resources" => {
+            for svc in services::SERVICES {
+                println!("{:<20} {}", svc.name, svc.description);
+            }
+            return;
+        }
+        "help" | "--help" | "-h" | "--version" | "-V" => {
             cmd.get_matches();
             return;
         }

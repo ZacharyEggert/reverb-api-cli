@@ -37,15 +37,15 @@ pub fn handle(matches: &ArgMatches) {
 pub fn methods_for(resource: &str) -> Vec<String> {
     match resource {
         "listings" => vec!["list", "get", "create", "update", "delete"],
-        "orders" => vec!["list", "get"],
-        "conversations" => vec!["list", "get", "create"],
-        "shop" => vec!["get", "update"],
-        "categories" => vec!["list"],
-        "handpicked" => vec!["list", "get"],
-        "priceguide" => vec!["get"],
-        "shipping" => vec!["list", "create", "update", "delete"],
-        "feedback" => vec!["list"],
-        "webhooks" => vec!["list", "create", "delete"],
+        // "orders" => vec!["list", "get"],
+        // "conversations" => vec!["list", "get", "create"],
+        // "shop" => vec!["get", "update"],
+        // "categories" => vec!["list"],
+        // "handpicked" => vec!["list", "get"],
+        // "priceguide" => vec!["get"],
+        // "shipping" => vec!["list", "create", "update", "delete"],
+        // "feedback" => vec!["list"],
+        // "webhooks" => vec!["list", "create", "delete"],
         _ => vec!["list", "get"],
     }
     .into_iter()
