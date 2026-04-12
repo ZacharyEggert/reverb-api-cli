@@ -1,6 +1,6 @@
 [package]
 name = "reverb-api-cli"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 edition = "2021"
 description = "Reverb CLI — command-line wrapper for the Reverb.com API"
 license = "MIT"
@@ -11,7 +11,7 @@ name = "revcli"
 path = "src/main.rs"
 
 [dependencies]
-reverb-api = { version = "0.1.0-alpha.1", path = "../reverb-api" }
+reverb-api = { version = "0.1.0-alpha.2", path = "../reverb-api" }
 anyhow = "1"
 clap = { version = "4", features = ["derive", "string"] }
 dirs = "5"

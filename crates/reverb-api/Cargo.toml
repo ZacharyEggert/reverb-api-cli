@@ -1,6 +1,6 @@
 [package]
 name = "reverb-api"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 edition = "2021"
 description = "Reverb.com API client — endpoint schema types, service registry, and HTTP utilities"
 license = "MIT"
