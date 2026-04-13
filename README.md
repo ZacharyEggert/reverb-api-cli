@@ -5,33 +5,15 @@ shop directly from the terminal.
 
 ## Installation
 
-### Homebrew
-
-```bash
-brew install reverbdotcom/tap/revcli
-```
-
-### npm / npx
-
-```bash
-npm install -g @reverbdotcom/cli
-# or run without installing
-npx @reverbdotcom/cli listings list
-```
-
 ### Cargo
 
 ```bash
 cargo install reverb-api-cli
 ```
 
-### GitHub Releases
-
-Download the latest binary for your platform from the [Releases](https://github.com/reverbdotcom/cli/releases) page.
-
 ## Authentication
 
-Get a personal API key from [reverb.com/my/api_access](https://reverb.com/my/api_access), then:
+Get a personal API key from [reverb.com/my/api_settings](https://reverb.com/my/api_settings), then:
 
 ```bash
 export REVERB_API_KEY=your_key_here
