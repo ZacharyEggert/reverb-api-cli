@@ -2,7 +2,7 @@
 name: recipe-pricecheck
 description: "Research active and sold Reverb listings to establish a used-market price range for purchasing intake."
 metadata:
-  version: 0.1.0-alpha.2
+  version: 0.1.0-alpha.3
   openclaw:
     category: "recipe"
     domain: "purchasing"
@@ -22,10 +22,32 @@ for possible purchase. Returns raw data with source links — the buyer makes th
 
 ## Steps
 
-1. Fetch active listings:
-   `revcli listings list --query "MAKE MODEL" --page-all --per-page 50 --page-limit 4 --format json`
-2. Fetch sold listings:
-   `revcli listings list --query "MAKE MODEL" --params '{"show_only_sold":true}' --page-all --per-page 50 --page-limit 4 --format json`
+1. Fetch active and sold listings in parallel (write to files to avoid output truncation):
+   ```
+   revcli listings list --query "MAKE MODEL" --page-all --per-page 50 --page-limit 4 --format json --output active.json
+   revcli listings list --query "MAKE MODEL" --params '{"show_only_sold":true}' --page-all --per-page 50 --page-limit 4 --format json --output sold.json
+   ```
+2. Parse both files with Python. **`--page-all` emits one JSON object per page, not a single array** — use `raw_decode` to walk all pages:
+   ```python
+   import json
+   from json import JSONDecoder
+
+   def load_pages(path):
+       with open(path) as f:
+           text = f.read().strip()
+       decoder, pos, listings = JSONDecoder(), 0, []
+       while pos < len(text):
+           while pos < len(text) and text[pos] in ' \n\r\t':
+               pos += 1
+           if pos >= len(text):
+               break
+           obj, pos = decoder.raw_decode(text, pos)
+           listings.extend(obj.get('listings', []))
+       return listings
+
+   active  = load_pages('active.json')
+   sold    = load_pages('sold.json')
+   ```
 3. For each result, extract:
     - `title` — listing title
     - `condition.display_name` — condition label (e.g. `"Excellent"`, `"Brand New"`)
