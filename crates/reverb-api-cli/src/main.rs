@@ -62,7 +62,7 @@ async fn main() {
             }
             return;
         }
-        "help" | "--help" | "-h" | "--version" | "-V" => {
+        "" | "help" | "--help" | "-h" | "--version" | "-V" => {
             cmd.get_matches();
             return;
         }
