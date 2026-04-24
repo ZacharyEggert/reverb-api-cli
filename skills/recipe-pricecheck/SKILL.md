@@ -2,7 +2,7 @@
 name: recipe-pricecheck
 description: "Research active and sold Reverb listings to establish a used-market price range for purchasing intake."
 metadata:
-  version: 0.1.0-alpha.3
+  version: 0.1.0-alpha.4
   openclaw:
     category: "recipe"
     domain: "purchasing"
@@ -24,8 +24,8 @@ for possible purchase. Returns raw data with source links — the buyer makes th
 
 1. Fetch active and sold listings in parallel (write to files to avoid output truncation):
    ```
-   revcli listings list --query "MAKE MODEL" --page-all --per-page 50 --page-limit 4 --format json --output active.json
-   revcli listings list --query "MAKE MODEL" --params '{"show_only_sold":true}' --page-all --per-page 50 --page-limit 4 --format json --output sold.json
+   revcli listings list --query "MAKE MODEL" --page-all --per-page 50 --page-limit 4 --format json --output /tmp/active.json
+   revcli listings list --query "MAKE MODEL" --params '{"show_only_sold":true}' --page-all --per-page 50 --page-limit 4 --format json --output /tmp/sold.json
    ```
 2. Parse both files with Python. **`--page-all` emits one JSON object per page, not a single array** — use `raw_decode` to walk all pages:
    ```python
@@ -45,8 +45,8 @@ for possible purchase. Returns raw data with source links — the buyer makes th
            listings.extend(obj.get('listings', []))
        return listings
 
-   active  = load_pages('active.json')
-   sold    = load_pages('sold.json')
+   active  = load_pages('/tmp/active.json')
+   sold    = load_pages('/tmp/sold.json')
    ```
 3. For each result, extract:
     - `title` — listing title
@@ -78,3 +78,5 @@ for possible purchase. Returns raw data with source links — the buyer makes th
   large spread signals that active listings at ask price are likely negotiable or overpriced
 - **Always cite sources**: include `_links.web.href` for every listing used to establish the range
 - **Description is HTML**: strip `<p>`, `<ul>`, `<li>`, `<br>` etc. before reading condition notes
+- **Data presentation**: present the final output as tables with clearly labeled columns for each extracted field,
+  grouped by active vs sold
