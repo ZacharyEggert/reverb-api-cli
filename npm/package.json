@@ -1,5 +1,5 @@
 {
-  "name": "@reverbdotcom/cli",
+  "name": "reverb-api-cli",
   "description": "Reverb CLI — command-line wrapper for the Reverb.com API",
   "version": "0.1.0",
   "license": "MIT",
