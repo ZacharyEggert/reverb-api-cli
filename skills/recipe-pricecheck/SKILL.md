@@ -2,7 +2,7 @@
 name: recipe-pricecheck
 description: "Research active and sold Reverb listings to establish a used-market price range for purchasing intake."
 metadata:
-  version: 0.1.0-alpha.4
+  version: 0.1.0-alpha.5
   openclaw:
     category: "recipe"
     domain: "purchasing"
@@ -22,12 +22,13 @@ for possible purchase. Returns raw data with source links — the buyer makes th
 
 ## Steps
 
-1. Fetch active and sold listings in parallel (write to files to avoid output truncation):
+1. Fetch active and sold listings in parallel (write to files to avoid output truncation and limit context usage):
    ```
    revcli listings list --query "MAKE MODEL" --page-all --per-page 50 --page-limit 4 --format json --output /tmp/active.json
    revcli listings list --query "MAKE MODEL" --params '{"show_only_sold":true}' --page-all --per-page 50 --page-limit 4 --format json --output /tmp/sold.json
    ```
 2. Parse both files with Python. **`--page-all` emits one JSON object per page, not a single array** — use `raw_decode` to walk all pages:
+
    ```python
    import json
    from json import JSONDecoder
@@ -48,20 +49,22 @@ for possible purchase. Returns raw data with source links — the buyer makes th
    active  = load_pages('/tmp/active.json')
    sold    = load_pages('/tmp/sold.json')
    ```
-3. For each result, extract:
-    - `title` — listing title
-    - `condition.display_name` — condition label (e.g. `"Excellent"`, `"Brand New"`)
-    - `price.display` — human-readable sold/asking price (e.g. `"$7,899"`)
-    - `original_price.display` — original listing price before any discounts (present on sold listings; compare against
-      `price.display` to gauge discount depth)
-    - `state.description` — `"Live"` for active, `"Sold"` for sold
-    - `created_at` — listing creation date (useful for context on how long it's been on the market - or how long ago the
-      sale occurred (market trends positively over time))
-    - `description` — HTML; strip tags and scan for condition caveats (replaced parts, repairs, modifications, damage)
-    - `_links.web.href` — direct link to listing (cite this as source)
+
+3. For each result, using python, extract:
+   - `title` — listing title
+   - `condition.display_name` — condition label (e.g. `"Excellent"`, `"Brand New"`)
+   - `price.display` — human-readable sold/asking price (e.g. `"$7,899"`)
+   - `original_price.display` — original listing price before any discounts (present on sold listings; compare against
+     `price.display` to gauge discount depth)
+   - `state.description` — `"Live"` for active, `"Sold"` for sold
+   - `created_at` — listing creation date (useful for context on how long it's been on the market - or how long ago the
+     sale occurred (market trends positively over time))
+   - `description` — HTML; strip tags and scan for condition caveats (replaced parts, repairs, modifications, damage), careful to not misinterpret negated phrases (e.g. "no cracks", "not modified") as a caveat
+   - `_links.web.href` — direct link to listing (cite this as source)
+     - add "?show_sold=true" to the end of sold listing links to see the original listing page
 4. Present two separate price spreads (low → high), grouped by condition:
-    - **Active listings** (`state.slug: "live"`) — current asking prices
-    - **Sold listings** (`state.slug: "sold"`) — what buyers actually paid (primary baseline)
+   - **Active listings** (`state.slug: "live"`) — current asking prices
+   - **Sold listings** (`state.slug: "sold"`) — what buyers actually paid (primary baseline)
 5. Annotate each cited listing with any condition qualifiers found in the description (e.g. "replaced tuners", "
    refret", "crack repair", "only taken out for photos")
 
